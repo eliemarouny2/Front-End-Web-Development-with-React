@@ -20,9 +20,9 @@ function RenderComments({ comments }) {
          <h4>Comments</h4>
          {comments.map((ma) => {
             return (
-               <ul className="list-unstyled">
-                  <li >{ma.comment}</li>
-                  <li >--{ma.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(ma.date)))}</li>
+               <ul className="list-unstyled" id={ma.id}>
+                  <li id={ma.comment}>{ma.comment}</li>
+                  <li id={ma.author}>--{ma.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(ma.date)))}</li>
                </ul>
             )
          })}
