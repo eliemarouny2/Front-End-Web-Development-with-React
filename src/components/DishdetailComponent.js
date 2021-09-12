@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Card, CardImg, CardText, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Row, Col, Label } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, Errors, LocalForm, } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
 
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -22,8 +23,9 @@ class CommentForm extends Component {
       });
    }
    handleSubmit(values) {
-      console.log("Current state is: " + JSON.stringify(values));
-      alert("Current state is: " + JSON.stringify(values));
+      this.toggleModal();
+      console.log(this.props.dishId);
+      this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
    }
 
    render() {
@@ -40,7 +42,7 @@ class CommentForm extends Component {
                      </Row>
                      <Row className="form-group">
                         <Col md={{ size: 12, offset: 0 }}>
-                           <Control.select model=".contactType" className="form-control" name="contactType" >
+                           <Control.select model=".rating" className="form-control" name="rating" >
                               <option>1</option>
                               <option>2</option>
                               <option>3</option>
@@ -51,11 +53,11 @@ class CommentForm extends Component {
                      </Row>
 
                      <Row className="form-group">
-                        <Label for="name" md={3}><strong>Your Name</strong></Label>
+                        <Label for="author" md={3}><strong>Your Name</strong></Label>
                      </Row>
                      <Row className="form-group">
                         <Col md={{ size: 12, offset: 0 }} >
-                           <Control.text model=".name" id="name" name="name"
+                           <Control.text model=".author" id="author" name="author"
                               className="form-control"
                               placeholder="Your Name"
                               validators={{
@@ -74,12 +76,12 @@ class CommentForm extends Component {
                         </Col>
                      </Row>
                      <Row className="form-group">
-                        <Label for="rating" md={2}><strong>Comment</strong></Label>
+                        <Label for="comment" md={2}><strong>Comment</strong></Label>
                      </Row>
                      <Row className="form-group">
 
                         <Col md={12}>
-                           <Control.textarea model=".message" id="message" name="message" rows="12" className="form-control" />
+                           <Control.textarea model=".comment" id="comment" name="comment" rows="10" className="form-control" />
                         </Col>
                      </Row>
                      <Row className="form-group">
@@ -111,7 +113,7 @@ function RenderDish({ dish }) {
 
 
 
-function RenderComments({ comments }) {
+function RenderComments({ comments, addComment, dishId }) {
    return (
       <div className="col-xs-12 col-md-5 m-1">
          <h4>Comments</h4>
@@ -124,15 +126,32 @@ function RenderComments({ comments }) {
 
             )
          })}
-         <CommentForm />
+         <CommentForm dishId={dishId} addComment={addComment} />
       </div>
    );
 }
 
 
 const DishDetail = (props) => {
-
-   if (props.dish != null) {
+   if (props.isLoading) {
+      return (
+         <div className="container">
+            <div className="row">
+               <Loading />
+            </div>
+         </div>
+      )
+   }
+   else if (props.errMess) {
+      return (
+         <div className="container">
+            <div className="row">
+               <h4>{props.errMess}</h4>
+            </div>
+         </div>
+      )
+   }
+   else if (props.dish != null) {
       return (
          <div className="container">
             <div className="row">
@@ -147,7 +166,9 @@ const DishDetail = (props) => {
             </div>
             <div className="row" >
                <RenderDish dish={props.dish} />
-               <RenderComments comments={props.comments} />
+               <RenderComments comments={props.comments}
+                  addComment={props.addComment}
+                  dishId={props.dish.id} />
             </div>
 
 
